@@ -1,0 +1,172 @@
+---
+import About from '../components/sections/About.astro';
+import Contact from '../components/sections/Contact.astro';
+import Experience from '../components/sections/Experience.astro';
+import GitHubActivity from '../components/sections/GitHubActivity.astro';
+import Hero from '../components/sections/Hero.astro';
+import Projects from '../components/sections/Projects.astro';
+import Research from '../components/sections/Research.astro';
+import Skills from '../components/sections/Skills.astro';
+import { profile } from '../data/profile';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title={`${profile.name} | 포트폴리오`}
+  description={profile.introduction}
+>
+  <aside class="banner" aria-label="해커톤 참가 소식">
+    <div class="banner-cloth" data-banner-cloth>
+      <span class="banner-eyelet banner-eyelet-left" aria-hidden="true"></span>
+      <span class="banner-eyelet banner-eyelet-right" aria-hidden="true"></span>
+      <p class="banner-message">
+        <span class="banner-character">慶</span>
+        <span>이서원이 UN 인도해커톤 나갑니다</span>
+        <span class="banner-character">祝</span>
+      </p>
+    </div>
+  </aside>
+  <Hero />
+  <About />
+  <Experience />
+  <Research />
+  <Skills />
+  <Projects />
+  <GitHubActivity />
+  <Contact />
+</Layout>
+
+<script>
+  import { enableBannerMotion } from '../scripts/banner-motion';
+
+  let disposeBannerMotion: (() => void) | undefined;
+
+  document.addEventListener('astro:page-load', () => {
+    disposeBannerMotion?.();
+    const cloth = document.querySelector<HTMLElement>('[data-banner-cloth]');
+    disposeBannerMotion = cloth ? enableBannerMotion(cloth) : undefined;
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    disposeBannerMotion?.();
+    disposeBannerMotion = undefined;
+  });
+</script>
+
+<style>
+  .banner {
+    position: relative;
+    margin: 0.7rem 0.65rem 2.5rem;
+    filter: drop-shadow(0 5px 7px rgb(0 0 0 / 20%));
+  }
+
+  .banner::before,
+  .banner::after {
+    position: absolute;
+    top: -0.4rem;
+    width: 1.35rem;
+    height: 2px;
+    background: #a48d7a;
+    content: '';
+  }
+
+  .banner::before {
+    left: -0.45rem;
+    transform: rotate(34deg);
+  }
+
+  .banner::after {
+    right: -0.45rem;
+    transform: rotate(-34deg);
+  }
+
+  .banner-cloth {
+    --cloth-slack: 22px;
+    position: relative;
+    clip-path: var(--cloth-outline, polygon(
+      0 0, 10% 3%, 22% 5.5%, 36% 7%, 50% 7.5%, 64% 7%, 78% 5.5%, 90% 3%, 100% 0,
+      100% calc(92.5% - var(--cloth-slack)), 90% calc(95.5% - var(--cloth-slack)), 78% calc(98% - var(--cloth-slack)),
+      64% calc(99.5% - var(--cloth-slack)), 50% calc(100% - var(--cloth-slack)), 36% calc(99.5% - var(--cloth-slack)),
+      22% calc(98% - var(--cloth-slack)), 10% calc(95.5% - var(--cloth-slack)), 0 calc(92.5% - var(--cloth-slack))
+    ));
+    padding: 1.45rem 0.65rem calc(1.25rem + var(--cloth-slack));
+    background-color: #fff;
+    background-image:
+      linear-gradient(108deg, #e8e0d4 0%, #fff 9%, #fbf9f5 24%, transparent 37%, #eee8df 79%, #fff 92%, #e5ddcf 100%),
+      linear-gradient(180deg, #fff 58%, #f4f0e9 100%);
+    color: #231917;
+  }
+
+  .banner-cloth[data-motion] {
+    cursor: grab;
+    touch-action: pan-y pinch-zoom;
+    user-select: none;
+  }
+
+  .banner-cloth[data-dragging] { cursor: grabbing; }
+
+  .banner-cloth::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    opacity: var(--fold-strength, 0);
+    background:
+      radial-gradient(ellipse 14% 58% at var(--fold-x, 50%) var(--fold-y, 50%), rgb(105 79 52 / 28%), transparent 82%),
+      conic-gradient(
+        from var(--fold-angle, 0deg) at var(--fold-x, 50%) var(--fold-y, 50%),
+        transparent 10deg, rgb(83 59 39 / 19%) 22deg, rgb(255 255 255 / 72%) 30deg, transparent 43deg 158deg,
+        rgb(87 62 36 / 19%) 172deg, rgb(255 255 255 / 70%) 178deg, transparent 190deg 309deg,
+        rgb(91 65 41 / 16%) 320deg, rgb(255 255 255 / 64%) 328deg, transparent 341deg
+      );
+    mask-image: radial-gradient(ellipse 38% 115% at var(--fold-x, 50%) var(--fold-y, 50%), #000 15%, transparent 95%);
+  }
+
+  .banner-eyelet {
+    position: absolute;
+    top: 0.38rem;
+    width: 0.34rem;
+    height: 0.34rem;
+    z-index: 1;
+    border: 1px solid #756354;
+    border-radius: 50%;
+    background-color: #b2a194;
+  }
+
+  .banner-eyelet-left { left: 0.43rem; }
+  .banner-eyelet-right { right: 0.43rem; }
+
+  .banner-message {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    transform: translateY(var(--message-shift, 0px)) rotate(var(--message-tilt, 0deg));
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(0.35rem, 2vw, 1.15rem);
+    text-align: center;
+    font-size: clamp(1.18rem, 3.15vw, 2rem);
+    font-weight: 850;
+    line-height: 1.23;
+    letter-spacing: -0.045em;
+    word-break: keep-all;
+  }
+
+  .banner-character {
+    display: grid;
+    place-items: center;
+    width: clamp(2rem, 5vw, 3.15rem);
+    aspect-ratio: 1;
+    border: 2px solid #ad2c25;
+    border-radius: 50%;
+    color: #ad2c25;
+    font-family: "AppleMyungjo", "Noto Serif CJK KR", serif;
+    font-size: clamp(1.25rem, 3vw, 1.9rem);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .banner-cloth { padding: 1.9rem 1.6rem calc(1.6rem + var(--cloth-slack)); }
+  }
+</style>

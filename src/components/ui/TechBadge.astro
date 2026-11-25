@@ -1,0 +1,94 @@
+---
+import * as icons from 'simple-icons';
+
+interface Props {
+  name: string;
+  iconOnly?: boolean;
+}
+
+const { name, iconOnly = false } = Astro.props;
+
+const customMap: Record<string, string | undefined> = {
+  vue2: 'vuedotjs',
+  'react-native': 'react',
+  golang: 'go',
+  'spring boot': 'spring',
+  springboot: 'spring',
+  'c++': 'cplusplus',
+};
+
+function toSlug(name: string): string {
+  const lower = name.toLowerCase();
+  if (customMap[lower] !== undefined) {
+    return customMap[lower] || '';
+  }
+  return lower
+    .replace(/\.js$/, 'dotjs')
+    .replace(/\.css$/, 'css')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function getIcon(name: string) {
+  const slug = toSlug(name);
+  if (!slug) return undefined;
+  const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1)}`;
+  return (icons as Record<string, { path: string; hex: string } | undefined>)[iconKey];
+}
+
+const icon = getIcon(name);
+const customPaths: Record<string, string> = {
+  comfyui: 'M3 4h6v6H3zM15 14h6v6h-6zM9 7h5a4 4 0 0 1 4 4v3',
+  codex: 'M5 6l5 5-5 5m8 1h6',
+};
+const customPath = customPaths[name.toLowerCase()];
+---
+
+{
+  iconOnly ? (
+    icon ? (
+      <svg
+        class="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-500"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d={icon.path} />
+      </svg>
+    ) : customPath ? (
+      <svg class="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d={customPath} />
+      </svg>
+    ) : (
+      <div class="w-4 h-4 shrink-0 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center" aria-hidden="true">
+        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+          {name.charAt(0)}
+        </span>
+      </div>
+    )
+  ) : icon ? (
+    <div class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-400 dark:hover:border-slate-600 transition-colors group">
+      <svg
+        class="w-5 h-5"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        style={`color: #${icon.hex}`}
+      >
+        <path d={icon.path} />
+      </svg>
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100">
+        {name}
+      </span>
+    </div>
+  ) : (
+    <div class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-400 dark:hover:border-slate-600 transition-colors group">
+      <div class="w-5 h-5 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">
+          {name.charAt(0)}
+        </span>
+      </div>
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100">
+        {name}
+      </span>
+    </div>
+  )
+}

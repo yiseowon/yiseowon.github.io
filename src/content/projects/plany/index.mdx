@@ -1,0 +1,34 @@
+---
+title: Plany
+company: 개인 프로젝트
+role: 기획·프런트엔드·데이터 연동·배포 및 운영
+techStack: [HTML, CSS, JavaScript, Firebase Authentication, Cloud Firestore, Google Maps Platform]
+shortDesc: 친구와 일정·장소·비용·준비물을 함께 관리하는 여행 계획 웹 앱
+category: 웹
+features:
+  - 여행 일정, 장소, 비용, 준비물 공유
+  - 지도에서 장소 확인과 대중교통 경로 조회
+  - 경로 조회가 실패했을 때 대체 조회와 지도 길찾기 연결
+hashtags: [여행, 협업, 지도]
+learnings: []
+links:
+  - label: GitHub
+    url: https://github.com/yiseowon/Plany
+  - label: 경로 조회 구현
+    url: https://github.com/yiseowon/Plany/blob/f5b92e3b6b4a3adf083cf2b455f223d9a9164ee7/app.js#L1099-L1130
+  - label: 경로 조회 테스트
+    url: https://github.com/yiseowon/Plany/blob/f5b92e3b6b4a3adf083cf2b455f223d9a9164ee7/tests/route-utils.test.mjs
+order: 1
+---
+
+## 친구와 여행을 준비하며 만든 서비스
+
+일정을 짜는 동안 장소, 지출, 준비물을 한곳에서 공유하고 싶어 1인 개발했습니다. 친구와 일본 여행을 계획할 때 실제로 함께 사용했습니다. 통화 중 불편한 점을 들으면 그 자리에서 고치고 다시 테스트했습니다.
+
+## 대중교통 경로가 표시되지 않는 문제
+
+외부 API를 처음 연동하면서 잘못 구현한 부분 때문에 대중교통 경로가 화면에 나타나지 않았습니다. 경로를 요청하고 응답을 읽는 코드를 고쳤습니다. Routes API에서 결과를 얻지 못하면 Directions Service로 다시 조회하고, 두 조회에서 모두 결과를 얻지 못하면 같은 출발지와 목적지를 Google 지도 길찾기에 전달하도록 구성했습니다.
+
+## 검증과 운영
+
+모의 API 응답을 사용해 정상 응답, 빈 결과, 오류에 따른 동작을 검증했습니다. 응답 파싱과 길찾기 URL 생성을 포함한 단위 테스트 7개를 통과했습니다. 배포 후 8개월간 운영하며 약 500달러의 수익을 기록했습니다. 서비스 운영은 종료했고 소스 코드는 공개하고 있습니다.

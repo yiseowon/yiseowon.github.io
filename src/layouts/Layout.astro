@@ -1,0 +1,238 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import Sidebar from '../components/layout/Sidebar.astro';
+import ThemeToggle from '../components/ui/ThemeToggle.astro';
+import { profile } from '../data/profile';
+import { socials } from '../data/socials';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const favicon = '/favicon-cat.svg';
+
+const {
+  title = '포트폴리오',
+  description = '개발자 포트폴리오입니다.',
+  image = favicon,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin);
+const siteUrl = Astro.site?.toString() || Astro.url.origin;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.role,
+  description: profile.introduction,
+  url: siteUrl,
+  sameAs: [socials.github.url],
+  email: socials.email,
+};
+---
+
+<!doctype html>
+<html lang="ko" transition:name="root" transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href={favicon} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta
+      property="og:image"
+      content={new URL(image, Astro.site || Astro.url.origin)}
+    />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta
+      name="twitter:image"
+      content={new URL(image, Astro.site || Astro.url.origin)}
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <script is:inline>
+      (function () {
+        const navigation = performance.getEntriesByType('navigation')[0];
+        const isHomeReload = location.pathname === '/' && navigation?.type === 'reload';
+        if (location.pathname === '/' && (!location.hash || isHomeReload)) {
+          history.scrollRestoration = 'manual';
+          if (isHomeReload && location.hash) {
+            history.replaceState(history.state, '', location.pathname + location.search);
+          }
+          window.addEventListener('pageshow', (event) => {
+            if (!event.persisted) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          }, { once: true });
+        }
+
+        const getInitialTheme = function () {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+            return localStorage.getItem('theme');
+          }
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+          }
+          return 'light';
+        };
+        const theme = getInitialTheme();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <ClientRouter />
+  </head>
+  <body class="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
+
+    <div
+      id="scroll-progress"
+      class="fixed top-0 left-0 h-0.5 bg-accent z-[60] transition-all duration-150 ease-out"
+      style="width: 0%;"
+    />
+
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[90] focus:px-4 focus:py-2 focus:bg-white focus:text-slate-900 focus:border focus:border-slate-300 focus:rounded-md"
+    >
+      본문으로 건너뛰기
+    </a>
+
+    <div class="lg:flex">
+      <Sidebar />
+      <div class="flex-1 min-w-0">
+        <Header />
+        <div class="max-w-[50rem] mx-auto px-4 sm:px-7 lg:px-14">
+          <main id="main-content" class="pt-10 lg:pt-20" transition:animate="fade">
+            <slot />
+          </main>
+          <Footer />
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed z-50 top-3 right-14 sm:right-16 lg:top-auto lg:right-auto lg:bottom-12 lg:left-10">
+      <ThemeToggle />
+    </div>
+
+    <button
+      id="scroll-to-top"
+      aria-label="맨 위로"
+      class="fixed bottom-6 right-6 z-50 p-3 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-800 opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:border-slate-400 dark:hover:border-slate-600 hover:text-accent"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+
+    <div
+      id="toast-container"
+      class="fixed top-20 right-4 z-[70] flex flex-col gap-2 pointer-events-none"
+      aria-live="polite"
+    />
+
+    <script>
+      import AOS from 'aos';
+      import 'aos/dist/aos.css';
+      import { getInitialTheme, applyTheme } from '../scripts/theme';
+
+      function initAOS() {
+        AOS.init({
+          duration: 800,
+          once: true,
+          offset: 50,
+        });
+      }
+
+      function initTheme() {
+        const theme = getInitialTheme();
+        applyTheme(theme);
+        document.dispatchEvent(new CustomEvent('theme-applied', { detail: { theme } }));
+      }
+
+      function initScrollProgress() {
+        const bar = document.getElementById('scroll-progress');
+        if (!bar) return;
+        const update = () => {
+          const scrollTop = window.scrollY;
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+          bar.style.width = `${progress}%`;
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+      }
+
+      function initScrollToTop() {
+        const btn = document.getElementById('scroll-to-top');
+        if (!btn) return;
+        const toggle = () => {
+          if (window.scrollY > 400) {
+            btn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+          } else {
+            btn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+          }
+        };
+        window.addEventListener('scroll', toggle, { passive: true });
+        btn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        toggle();
+      }
+
+      function initToast() {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        (window as any).showToast = function (message: string, type: 'success' | 'error' | 'info' = 'success') {
+          const toast = document.createElement('div');
+          const bgClass = type === 'success'
+            ? 'bg-green-600'
+            : type === 'error'
+              ? 'bg-red-600'
+              : 'bg-slate-900';
+          toast.className = `${bgClass} text-white px-4 py-3 rounded-lg text-sm font-medium pointer-events-auto transform transition-all duration-300 translate-x-full opacity-0`;
+          toast.textContent = message;
+          container.appendChild(toast);
+
+          requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+          });
+
+          setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+          }, 2500);
+        };
+      }
+
+      function initAll() {
+        initAOS();
+        initTheme();
+        initScrollProgress();
+        initScrollToTop();
+        initToast();
+      }
+
+      initAll();
+      document.addEventListener('astro:page-load', initAll);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+---
+import { profile } from '../../data/profile';
+import SectionHeader from '../ui/SectionHeader.astro';
+---
+
+<section id="about" aria-labelledby="about-heading" class="pt-24" data-aos="fade-up">
+  <SectionHeader label="01 / About" title={`반갑습니다 ${profile.name}입니다.`} id="about-heading" />
+
+  <p class="text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+    {profile.introduction}
+  </p>
+</section>

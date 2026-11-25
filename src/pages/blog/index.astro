@@ -1,0 +1,70 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { blogUrl, getRecentBlogPosts } from '../../lib/naver-blog';
+
+const dateFormat = new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+let posts: Awaited<ReturnType<typeof getRecentBlogPosts>> = [];
+let loadFailed = false;
+try {
+  posts = await getRecentBlogPosts();
+} catch (error) {
+  console.error('[blog] 네이버 RSS를 불러오지 못했습니다.', error);
+  if (import.meta.env.PROD && process.env.CI) throw error;
+  loadFailed = true;
+}
+---
+
+<Layout title="블로그 | 포트폴리오" description="이서원 네이버 블로그 최근 글">
+  <header class="mb-10 flex flex-wrap items-baseline justify-between gap-x-5 gap-y-3">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-50">
+      블로그
+    </h1>
+    <a
+      href={blogUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-sm text-accent underline underline-offset-4 transition-colors hover:text-slate-900 dark:hover:text-slate-50"
+    >
+      네이버 블로그 보기
+    </a>
+  </header>
+
+  <section aria-labelledby="recent-posts-heading">
+    <h2 id="recent-posts-heading" class="mb-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+      최근 글
+    </h2>
+    {
+      posts.length > 0 ? (
+        <ul class="border-t border-slate-200 dark:border-slate-800">
+          {posts.map((post) => (
+            <li class="border-b border-slate-200 dark:border-slate-800">
+              <a
+                href={post.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group grid gap-x-6 gap-y-1 py-5 sm:grid-cols-[9rem_1fr] sm:items-baseline"
+              >
+                <time datetime={post.publishedAt.toISOString()} class="font-mono text-xs text-slate-500 dark:text-slate-400">
+                  {dateFormat.format(post.publishedAt)}
+                </time>
+                <span class="min-w-0 font-semibold break-words text-slate-900 transition-colors group-hover:text-accent dark:text-slate-50">
+                  {post.title}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="border-y border-slate-200 py-5 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+          {loadFailed ? '최근 글을 불러오지 못했어요.' : '아직 공개 글이 없어요.'}
+        </p>
+      )
+    }
+  </section>
+</Layout>

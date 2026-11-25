@@ -1,0 +1,65 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+
+const papers = [
+  {
+    title: '동적 블록 분할 기반 영상 프레임 보간 알고리즘에 관한 연구',
+    date: '2026-11',
+    venue: '한국정보산업학회 추계학술대회',
+    files: [
+      { label: '논문 PDF', href: '/research/vfi-paper.pdf' },
+      { label: '학술 포스터 PDF', href: '/research/vfi-poster.pdf' },
+    ],
+  },
+  {
+    title: 'Stable Diffusion 기반 AI 이미지 생성 모델의 손가락 표현 오류 분석 및 개선 방안',
+    date: '2025-10',
+    files: [{ label: '논문 PDF', href: '/research/stable-diffusion.pdf' }],
+  },
+];
+
+const patent = {
+  title: '시공간 및 주파수 도메인 융합을 통한 딥페이크 판별 모델',
+  applicationNumber: '10-2025-0161169',
+};
+---
+
+<section id="research" aria-labelledby="research-heading" class="pt-24" data-aos="fade-up">
+  <SectionHeader label="Research" title="논문 및 특허" id="research-heading" />
+
+  <h3 class="mb-4 font-mono text-xs tracking-widest text-slate-500 dark:text-slate-400">논문</h3>
+  <ul class="border-t border-slate-200 dark:border-slate-800">
+    {papers.map((paper) => (
+      <li class="py-5 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
+          <p class="font-semibold text-slate-900 dark:text-slate-50">{paper.title}</p>
+          <time datetime={paper.date} class="font-mono text-sm text-slate-500 dark:text-slate-400">
+            {paper.date.replace('-', '.')}
+          </time>
+        </div>
+        {paper.venue && <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{paper.venue}</p>}
+        <ul class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          {paper.files.map((file) => (
+            <li>
+              <a
+                href={file.href}
+                target="_blank"
+                rel="noopener"
+                aria-label={`${paper.title} ${file.label} 새 탭에서 열기`}
+                class="text-accent underline underline-offset-4 transition-colors hover:text-slate-900 dark:hover:text-slate-50"
+              >
+                {file.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+
+  <h3 class="mt-12 mb-4 font-mono text-xs tracking-widest text-slate-500 dark:text-slate-400">특허 출원</h3>
+  <div class="border-y border-slate-200 py-5 dark:border-slate-800">
+    <p class="font-semibold text-slate-900 dark:text-slate-50">{patent.title}</p>
+    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">출원번호 <span class="font-mono">{patent.applicationNumber}</span></p>
+  </div>
+</section>

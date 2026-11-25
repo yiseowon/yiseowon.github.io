@@ -1,0 +1,28 @@
+---
+title: Opium
+company: 개인 프로젝트
+role: 로컬 모델 연동·macOS 화면 제어 개발
+techStack: [Swift, SwiftUI, AppKit, ScreenCaptureKit, Core Graphics, llama.cpp]
+shortDesc: 로컬 LLM에 MCP와 원하는 도구를 연결하는 macOS 앱
+category: macOS
+features:
+  - 로컬 모델에 MCP와 도구 연결
+  - 스크린샷과 클릭 이벤트가 같은 좌표계를 사용하도록 처리
+  - 승인 미리보기에서 클릭 예정 위치 표시
+hashtags: [로컬 LLM, MCP, Computer Use]
+learnings: []
+links:
+  - label: GitHub
+    url: https://github.com/yiseowon/Opium
+  - label: 좌표 불일치 개발 기록
+    url: https://github.com/yiseowon/Opium/blob/942c62ea96495b6130b7b7af8ac35f40ad4b9fd2/docs/2026-08-17-devlog.md#L53-L57
+order: 3
+---
+
+## 로컬 모델에 필요한 도구를 붙이려고 시작
+
+Ollama와 LM Studio를 사용하면서 모델의 실행 방식을 직접 제어하고 원하는 MCP나 도구를 연결할 수 있는 환경을 만들고 싶었습니다. 그 과정에서 로컬 모델이 macOS 화면을 보고 클릭 위치를 고르는 기능을 구현했습니다.
+
+## 스크린샷과 실제 클릭의 좌표 맞추기
+
+모델에 제공하는 스크린샷은 폭 1,280픽셀로 축소했지만, 모델이 반환한 위치를 실제 디스플레이 좌표로 해석해 클릭이 어긋났습니다. 모델 입력용 화면을 디스플레이의 포인트 해상도로 캡처해 macOS 클릭 이벤트와 좌표 기준을 맞췄습니다. 승인 카드에서만 이미지를 축소하고 클릭 위치에도 같은 축척을 적용했습니다.

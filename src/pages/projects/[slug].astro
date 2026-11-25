@@ -1,0 +1,346 @@
+---
+import { getCollection, render } from 'astro:content';
+import ProjectRow from '../../components/ui/ProjectRow.astro';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const sorted = projects.sort((a, b) => a.data.order - b.data.order);
+
+  return sorted.map((project, index) => {
+    const prev = sorted[index - 1] ?? null;
+    const next = sorted[index + 1] ?? null;
+    const related = sorted
+      .filter((p) => p.id !== project.id && p.data.category === project.data.category)
+      .slice(0, 3);
+    return {
+      params: { slug: project.id },
+      props: { project, prev, next, related },
+    };
+  });
+}
+
+const { project, prev, next, related } = Astro.props;
+const { Content } = await render(project);
+const { data } = project;
+
+const period = data.startDate ? `${data.startDate} — ${data.endDate ?? '현재'}` : undefined;
+const meta = [
+  { label: '소속', value: data.company },
+  { label: '역할', value: data.role },
+  { label: '기간', value: period },
+  { label: '분류', value: data.category },
+].filter((item) => item.value);
+---
+
+<Layout title={`${data.title} | 프로젝트`} description={data.shortDesc}>
+  <article>
+    <a
+      href="/projects"
+      class="group inline-flex items-center gap-2 font-mono text-xs text-slate-500 dark:text-slate-400 hover:text-accent transition-colors"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform" aria-hidden="true">←</span>
+      프로젝트 목록
+    </a>
+
+    <header class="mt-8">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+        {data.title}
+      </h1>
+      <p class="mt-4 text-lg text-slate-600 dark:text-slate-400">{data.shortDesc}</p>
+      <p class="mt-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+        {data.hashtags.map((tag) => `#${tag}`).join('  ')}
+      </p>
+    </header>
+
+    <dl class="grid grid-cols-2 sm:grid-cols-4 mt-10 border-y border-slate-200 dark:border-slate-800">
+      {
+        meta.map((item) => (
+          <div class="py-4 pr-4">
+            <dt class="font-mono text-xs text-slate-500 dark:text-slate-400">{item.label}</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-50">{item.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    {data.coverImage && (
+      <div
+        class="mt-10 aspect-video overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+        transition:name={`project-image-${project.id}`}
+      >
+        <img src={data.coverImage} alt={`${data.title} 대표 이미지`} class="w-full h-full object-contain" />
+      </div>
+    )}
+
+    <section class="grid sm:grid-cols-[10.5rem_1fr] gap-x-6 gap-y-3 py-8 mt-10 border-t border-slate-200 dark:border-slate-800">
+      <h2 class="font-mono text-xs leading-6 tracking-widest uppercase text-slate-500 dark:text-slate-400">기술 스택</h2>
+      <p class="text-sm leading-6 text-slate-800 dark:text-slate-200">{data.techStack.join(' · ')}</p>
+    </section>
+
+    <section class="grid sm:grid-cols-[10.5rem_1fr] gap-x-6 gap-y-3 py-8 border-t border-slate-200 dark:border-slate-800">
+      <h2 class="font-mono text-xs leading-6 tracking-widest uppercase text-slate-500 dark:text-slate-400">주요 기능</h2>
+      <ul class="space-y-2 text-slate-700 dark:text-slate-300">
+        {
+          data.features.map((feature) => (
+            <li class="flex gap-3">
+              <span class="text-slate-300 dark:text-slate-700" aria-hidden="true">—</span>
+              <span>{feature}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      data.screenshots && data.screenshots.length > 0 && (
+        <section class="py-8 border-t border-slate-200 dark:border-slate-800">
+          <h2 class="mb-6 font-mono text-xs tracking-widest uppercase text-slate-500 dark:text-slate-400">스크린샷</h2>
+          <div class="grid grid-cols-2 gap-3 sm:gap-5" id="screenshot-gallery">
+            {data.screenshots.map((src, i) => (
+              <button
+                type="button"
+                class="aspect-[4/5] overflow-hidden rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 cursor-zoom-in hover:border-slate-400 dark:hover:border-slate-600 transition-colors"
+                data-screenshot-index={i}
+                aria-label={`스크린샷 ${i + 1} 크게 보기`}
+              >
+                <img
+                  src={src}
+                  alt={`${data.title} 스크린샷 ${i + 1}`}
+                  class="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <div class="prose prose-slate dark:prose-invert max-w-none py-8 border-t border-slate-200 dark:border-slate-800">
+      <Content />
+    </div>
+
+    {
+      data.learnings.length > 0 && (
+        <section class="grid sm:grid-cols-[10.5rem_1fr] gap-x-6 gap-y-3 py-8 border-t border-slate-200 dark:border-slate-800">
+          <h2 class="font-mono text-xs leading-6 tracking-widest uppercase text-slate-500 dark:text-slate-400">배운 점</h2>
+          <ul class="space-y-2 text-slate-700 dark:text-slate-300">
+            {data.learnings.map((learning) => (
+              <li class="flex gap-3">
+                <span class="text-slate-300 dark:text-slate-700" aria-hidden="true">—</span>
+                <span>{learning}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      data.links && data.links.length > 0 && (
+        <section class="grid sm:grid-cols-[10.5rem_1fr] gap-x-6 gap-y-3 py-8 border-t border-slate-200 dark:border-slate-800">
+          <h2 class="font-mono text-xs leading-6 tracking-widest uppercase text-slate-500 dark:text-slate-400">링크</h2>
+          <ul class="flex flex-wrap gap-3">
+            {data.links.map((link) => (
+              <li>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white dark:text-slate-900 bg-slate-900 dark:bg-slate-50 rounded-md hover:bg-slate-700 dark:hover:bg-slate-200 transition-colors"
+                >
+                  {link.label} <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+
+  <nav class="grid grid-cols-2 gap-6 mt-16 py-8 border-t border-slate-200 dark:border-slate-800" aria-label="이전·다음 프로젝트">
+    {
+      prev ? (
+        <a href={`/projects/${prev.id}`} class="group">
+          <span class="block font-mono text-xs text-slate-500 dark:text-slate-400">← 이전</span>
+          <span class="block mt-1 font-semibold text-slate-900 dark:text-slate-50 group-hover:text-accent transition-colors line-clamp-1">
+            {prev.data.title}
+          </span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      next && (
+        <a href={`/projects/${next.id}`} class="group text-right">
+          <span class="block font-mono text-xs text-slate-500 dark:text-slate-400">다음 →</span>
+          <span class="block mt-1 font-semibold text-slate-900 dark:text-slate-50 group-hover:text-accent transition-colors line-clamp-1">
+            {next.data.title}
+          </span>
+        </a>
+      )
+    }
+  </nav>
+
+  {
+    related.length > 0 && (
+      <section class="mt-8">
+        <h2 class="mb-4 font-mono text-xs tracking-widest uppercase text-slate-500 dark:text-slate-400">
+          관련 프로젝트
+        </h2>
+        <div class="border-t border-slate-200 dark:border-slate-800">
+          {related.map((p, i) => (
+            <ProjectRow
+              index={i}
+              title={p.data.title}
+              shortDesc={p.data.shortDesc}
+              company={p.data.company}
+              category={p.data.category}
+              startDate={p.data.startDate}
+              techStack={p.data.techStack}
+              hashtags={p.data.hashtags}
+              coverImage={p.data.coverImage}
+              slug={p.id}
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <div
+    id="lightbox"
+    class="fixed inset-0 z-[80] bg-black/90 hidden items-center justify-center p-4"
+  >
+    <button
+      id="lightbox-close"
+      class="absolute top-4 right-4 p-2 text-white/80 hover:text-white z-10"
+      aria-label="닫기"
+    >
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+    <button
+      id="lightbox-prev"
+      class="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white z-10 hidden"
+      aria-label="이전"
+    >
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+    <button
+      id="lightbox-next"
+      class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white z-10 hidden"
+      aria-label="다음"
+    >
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </button>
+    <img id="lightbox-img" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg" />
+  </div>
+
+  <script is:inline>
+    (function () {
+      const gallery = document.getElementById('screenshot-gallery');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const closeBtn = document.getElementById('lightbox-close');
+      const prevBtn = document.getElementById('lightbox-prev');
+      const nextBtn = document.getElementById('lightbox-next');
+
+      if (!gallery || !lightbox || !lightboxImg) return;
+
+      const buttons = gallery.querySelectorAll('button[data-screenshot-index]');
+      const images = Array.from(buttons).map((btn) => {
+        const img = btn.querySelector('img');
+        return img ? img.src : '';
+      });
+
+      let currentIndex = 0;
+
+      function open(index) {
+        if (images.length === 0) return;
+        currentIndex = index;
+        lightboxImg.src = images[currentIndex];
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        updateNav();
+      }
+
+      function close() {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+
+      function updateNav() {
+        if (images.length > 1) {
+          prevBtn?.classList.remove('hidden');
+          nextBtn?.classList.remove('hidden');
+        } else {
+          prevBtn?.classList.add('hidden');
+          nextBtn?.classList.add('hidden');
+        }
+      }
+
+      function next() {
+        currentIndex = (currentIndex + 1) % images.length;
+        lightboxImg.src = images[currentIndex];
+      }
+
+      function prev() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        lightboxImg.src = images[currentIndex];
+      }
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const index = Number(btn.getAttribute('data-screenshot-index'));
+          open(index);
+        });
+      });
+
+      closeBtn?.addEventListener('click', close);
+      lightbox?.addEventListener('click', (e) => {
+        if (e.target === lightbox) close();
+      });
+      prevBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        prev();
+      });
+      nextBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        next();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('hidden')) return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowRight') next();
+        if (e.key === 'ArrowLeft') prev();
+      });
+    })();
+  </script>
+</Layout>

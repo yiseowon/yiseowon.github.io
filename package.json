@@ -1,0 +1,27 @@
+{
+  "name": "seowon-portfolio",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.6",
+    "@astrojs/sitemap": "^3.7.6",
+    "@tailwindcss/vite": "^4.3.5",
+    "aos": "^2.3.4",
+    "astro": "^7.4.13",
+    "sax": "1.6.0",
+    "simple-icons": "^16.38.1",
+    "tailwindcss": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/aos": "^3.0.8",
+    "@types/sax": "1.2.7"
+  }
+}

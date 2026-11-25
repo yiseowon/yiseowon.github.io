@@ -1,0 +1,51 @@
+---
+import githubActivity from '../../data/github-activity';
+import { socials } from '../../data/socials';
+
+const recentActivity = githubActivity.slice(0, 6);
+const hasActivity = recentActivity.length > 0;
+---
+
+{
+  hasActivity && (
+    <section id="activity" aria-labelledby="activity-heading" class="pt-20" data-aos="fade-up">
+      <h3
+        id="activity-heading"
+        class="mb-4 font-mono text-xs tracking-widest uppercase text-slate-500 dark:text-slate-400"
+      >
+        최근 GitHub 활동
+      </h3>
+
+      <ul class="border-t border-slate-200 dark:border-slate-800">
+        {recentActivity.map((activity) => (
+          <li class="border-b border-slate-200 dark:border-slate-800">
+            <a
+              href={activity.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group grid grid-cols-[3.5rem_1fr] sm:grid-cols-[3.5rem_1fr_auto] gap-x-4 py-3 items-baseline"
+            >
+              <span class="font-mono text-xs uppercase text-slate-400">{activity.type}</span>
+              <span class="min-w-0 truncate text-sm text-slate-800 dark:text-slate-200 group-hover:text-accent transition-colors">
+                {activity.title}
+                <span class="text-slate-400"> · {activity.repo}</span>
+              </span>
+              <span class="hidden sm:block font-mono text-xs text-slate-400">
+                {new Date(activity.date).toLocaleDateString('ko-KR')}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <a
+        href={socials.github.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block mt-4 text-sm text-slate-500 dark:text-slate-400 hover:text-accent transition-colors"
+      >
+        GitHub에서 더보기 ↗
+      </a>
+    </section>
+  )
+}

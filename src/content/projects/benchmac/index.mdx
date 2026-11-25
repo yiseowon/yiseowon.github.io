@@ -1,0 +1,23 @@
+---
+title: BenchMac
+company: 개인 프로젝트
+role: 벤치마크·추정 모델 설계·웹 개발
+techStack: [JavaScript, GGUF, llama.cpp Metal, Docker]
+shortDesc: Mac에서 로컬 LLM을 실행할 수 있는지와 예상 속도를 비교하는 웹 도구
+category: 웹
+features:
+  - Mac 구성, 모델, 양자화 방식, 컨텍스트 길이 선택
+  - 예상 메모리 사용량과 실행 가능 여부 비교
+  - llama.cpp Metal 벤치마크 자료로 보정한 속도 범위 표시
+hashtags: [벤치마크, Apple Silicon, 로컬 LLM]
+learnings: []
+order: 4
+---
+
+## 내 Mac에서 어디까지 실행할 수 있을까
+
+Opium에 다른 모델을 추가하면서 내 Mac에서 어디까지 원활하게 돌아가는지 직접 벤치마크했습니다. 다른 Apple Silicon Mac 사용자도 모델을 올리기 전에 비슷한 판단을 할 수 있도록 결과를 비교 도구로 만들었습니다.
+
+## 메모리 적합도와 예상 속도
+
+메모리 적합도는 모델 가중치, KV 캐시, 런타임 오버헤드와 macOS용 여유 공간을 합산해 판단합니다. 속도 범위는 메모리 대역폭, GPU 코어 수, 냉각 조건을 반영하고 llama.cpp Metal 벤치마크 자료로 보정합니다. 카탈로그에는 M1~M5 Mac 구성 40종과 로컬 모델 23종이 있습니다.

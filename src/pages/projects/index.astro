@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectFilter from '../../components/projects/ProjectFilter.astro';
+import ProjectSearch from '../../components/projects/ProjectSearch.astro';
+import ProjectRow from '../../components/ui/ProjectRow.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { profile } from '../../data/profile';
+import Layout from '../../layouts/Layout.astro';
+
+const allProjects = await getCollection('projects');
+const sortedProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
+
+const allTechStack = [...new Set(sortedProjects.flatMap((p) => p.data.techStack))];
+---
+
+<Layout title={`프로젝트 | ${profile.name}`} description={`${profile.name}의 개발 프로젝트 목록입니다.`}>
+  <SectionHeader label={`Projects / ${allProjects.length}`} title="프로젝트" level={1}>
+    <p class="mt-4 text-slate-600 dark:text-slate-400">
+      개인 개발 프로젝트입니다. 항목을 누르면 구현 내용과 결과를 볼 수 있습니다.
+    </p>
+  </SectionHeader>
+
+  <div class="mb-10 space-y-8">
+    <ProjectSearch />
+    <ProjectFilter techStack={allTechStack} />
+  </div>
+
+  <div id="projects-grid" class="border-t border-slate-200 dark:border-slate-800">
+    {
+      sortedProjects.map((project, index) => (
+        <ProjectRow
+          index={index}
+          title={project.data.title}
+          shortDesc={project.data.shortDesc}
+          company={project.data.company}
+          category={project.data.category}
+          startDate={project.data.startDate}
+          techStack={project.data.techStack}
+          hashtags={project.data.hashtags}
+          coverImage={project.data.coverImage}
+          slug={project.id}
+          headingLevel={2}
+        />
+      ))
+    }
+  </div>
+
+  <div id="no-results" class="hidden py-16 text-center" role="status">
+    <p class="text-slate-900 dark:text-slate-50">검색 결과가 없습니다</p>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">다른 검색어나 필터를 시도해보세요</p>
+  </div>
+</Layout>

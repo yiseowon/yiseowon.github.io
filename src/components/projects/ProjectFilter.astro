@@ -1,0 +1,67 @@
+---
+interface Props {
+  techStack: string[];
+}
+
+const { techStack } = Astro.props;
+---
+
+<div>
+  <h2 class="mb-3 font-mono text-xs tracking-widest uppercase text-slate-500 dark:text-slate-400">
+    기술 스택
+  </h2>
+  <div class="flex flex-wrap gap-2" id="techstack-filters">
+    <button type="button" class="filter-btn active" data-filter-value="" aria-pressed="true">
+      전체
+    </button>
+    {techStack.slice(0, 12).map((tech) => (
+      <button type="button" class="filter-btn" data-filter-value={tech} aria-pressed="false">
+        {tech}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .filter-btn {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-slate-200);
+    color: var(--color-slate-600);
+    transition:
+      color 150ms,
+      border-color 150ms,
+      background-color 150ms;
+    cursor: pointer;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--color-slate-400);
+    color: var(--color-slate-900);
+  }
+
+  .filter-btn.active,
+  .filter-btn[aria-pressed="true"] {
+    background-color: var(--color-slate-900);
+    border-color: var(--color-slate-900);
+    color: white;
+  }
+
+  :global(.dark) .filter-btn {
+    border-color: var(--color-slate-800);
+    color: var(--color-slate-400);
+  }
+
+  :global(.dark) .filter-btn:hover {
+    border-color: var(--color-slate-600);
+    color: var(--color-slate-50);
+  }
+
+  :global(.dark) .filter-btn.active,
+  :global(.dark) .filter-btn[aria-pressed="true"] {
+    background-color: var(--color-slate-50);
+    border-color: var(--color-slate-50);
+    color: var(--color-slate-900);
+  }
+</style>

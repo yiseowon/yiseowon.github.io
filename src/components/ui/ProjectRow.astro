@@ -1,0 +1,78 @@
+---
+interface Props {
+  index: number;
+  title: string;
+  shortDesc: string;
+  company: string;
+  category: string;
+  startDate?: string;
+  techStack: string[];
+  hashtags: string[];
+  coverImage?: string;
+  slug: string;
+  headingLevel?: 2 | 3;
+}
+
+const {
+  index,
+  title,
+  shortDesc,
+  company,
+  category,
+  startDate,
+  techStack,
+  hashtags,
+  coverImage,
+  slug,
+  headingLevel = 3,
+} = Astro.props;
+
+const Heading = headingLevel === 2 ? 'h2' : 'h3';
+const number = String(index + 1).padStart(2, '0');
+const byline = [category, company, startDate?.slice(0, 4)].filter(Boolean).join(' · ');
+---
+
+<article
+  class="group relative border-b border-slate-200 dark:border-slate-800"
+  data-project-card
+  data-title={title}
+  data-description={shortDesc}
+  data-tags={hashtags.join(',')}
+  data-tech-stack={techStack.join(',')}
+>
+  <a
+    href={`/projects/${slug}`}
+    class:list={['grid grid-cols-[2.5rem_1fr] gap-x-4 py-6 items-start', coverImage && 'sm:grid-cols-[2.5rem_1fr_8rem]']}
+  >
+    <span class="font-mono text-xs leading-7 text-slate-400 dark:text-slate-600">{number}</span>
+
+    <div class="min-w-0">
+      <Heading
+        class="flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-50 group-hover:text-accent transition-colors"
+      >
+        {title}
+        <span
+          class="font-mono text-sm text-slate-300 dark:text-slate-700 group-hover:text-accent group-hover:translate-x-1 transition-all"
+          aria-hidden="true"
+        >
+          →
+        </span>
+      </Heading>
+      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{shortDesc}</p>
+      <p class="mt-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+        {byline}
+        <span class="hidden sm:inline text-slate-300 dark:text-slate-700"> / </span>
+        <span class="block sm:inline mt-1 sm:mt-0">{techStack.slice(0, 3).join(', ')}</span>
+      </p>
+    </div>
+
+    {coverImage && (
+      <div
+        class="hidden sm:block aspect-[4/3] overflow-hidden rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+        transition:name={`project-image-${slug}`}
+      >
+        <img src={coverImage} alt="" class="w-full h-full object-contain" loading="lazy" />
+      </div>
+    )}
+  </a>
+</article>
